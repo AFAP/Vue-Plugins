@@ -4,7 +4,7 @@
 
       <img :class="['handwriting-img-back', pointLines.length == 0 ? 'handwriting-img-disable' : '']" alt="返回上一步" src="~@/assets/image/handwriting-back.png" @click="backPreStep()">
       <img class="handwriting-img-setting" alt="设置颜色和笔刷" src="~@/assets/image/handwriting-setting.png" @click="showSetting = !showSetting">
-      <div :class="[pointLines.length == 0 ? 'handwriting-img-disable' : '']">完成</div>
+      <div :class="[pointLines.length == 0 ? 'handwriting-img-disable' : '']" @click="save()">完成</div>
 
     </div>
 
@@ -32,10 +32,7 @@
 </template>
 
 <script>
-Array.prototype.clone = function () {
-  return [].concat(this);
-  //或者 return this.concat();
-}
+
 class Point {
   constructor(x, y) {
     this.x = x;
@@ -59,8 +56,7 @@ class Line {
 export default {
   name: 'HandWriting',
   props: {
-    msg: String,
-
+    oncomplete: Function // 完成后的回调函数，参数为绘制得到的图片base64编码
   },
   data() {
     return {
@@ -113,7 +109,7 @@ export default {
     canvas.addEventListener("touchstart", this.beginDraw);
     canvas.addEventListener("touchmove", this.moving);
     canvas.addEventListener("touchend", this.endDraw);
-
+    canvas.style.background = "red"
     this.canvas = canvas;
     this.ctx = ctx;
 
@@ -307,10 +303,11 @@ export default {
         return
       }
       let points;
-      if (isUp)
+      if (isUp) {
         points = this.line.points;
-      else
-        points = this.line.points.clone();
+      } else {
+        points = [].concat(this.line.points);
+      }
       //当前绘制的线条最后几个补点 贝塞尔方式增加点
       let count = 0;
       let insertCount = 0;
@@ -440,18 +437,16 @@ export default {
 
       return result;
     },
-
-
-
-
     save() {
-      let data = this.canvas.toDataURL("image/png"); //把canvas画板上的内容转成指定格式图片数据，并进行Base64编码
-      let img = new Image();
-      img.src = data;
-      //   $(document.body).append(img);
+      if (this.pointLines.length == 0) {
+        return;
+      }
+      let data = this.canvas.toDataURL("image/png");
+      if (this.oncomplete) {
+        // console.log("调用完成回调函数")
+        this.oncomplete(data);
+      }
     }
-
-
   }
 }
 </script>

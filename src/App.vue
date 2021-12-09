@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <HandWriting msg="Welcome to Your Vue.js App" />
+    <HandWriting style="width: 300px;height: 200px;" :oncomplete="handwritingComplete" />
   </div>
 </template>
 
@@ -12,6 +12,11 @@ export default {
   name: 'App',
   components: {
     HandWriting
+  },
+  methods: {
+    handwritingComplete(base64Data) {
+      console.log('APP', base64Data)
+    }
   }
 }
 </script>
