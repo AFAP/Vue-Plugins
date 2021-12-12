@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <HandWriting style="width: 300px;height: 200px;" :oncomplete="handwritingComplete" />
+    <HandWriting  background="#b0b7f8" type="png" :oncomplete="handwritingComplete" />
+    <!-- style="width: 300px;height: 200px;" -->
   </div>
 </template>
 
@@ -34,7 +35,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #b0b7f8;
   height: 100vh;
 }
 </style>

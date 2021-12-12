@@ -56,6 +56,8 @@ class Line {
 export default {
   name: 'HandWriting',
   props: {
+    background: String, // 背景色
+    type: String, // 导出的类型，默认png,非png则是jpeg
     oncomplete: Function // 完成后的回调函数，参数为绘制得到的图片base64编码
   },
   data() {
@@ -82,16 +84,10 @@ export default {
     ctx.lineWidth = this.lineWidth; //设置画笔粗细
     ctx.strokeStyle = this.lineColor;
     ctx.fillStyle = this.lineColor;
-
     ctx.lineJoin = "round"; //设置画笔轨迹基于圆点拼接
-
 
     let width = canvas.clientWidth;
     let height = canvas.clientHeight;
-
-
-    console.log(height, width)
-
     if (window.devicePixelRatio) {
       canvas.style.width = width + "px";
       canvas.style.height = height + "px";
@@ -100,8 +96,6 @@ export default {
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
-
-
     canvas.onmousedown = this.beginDraw;
     canvas.onmousemove = this.moving;
     canvas.onmouseup = this.endDraw;
@@ -109,10 +103,13 @@ export default {
     canvas.addEventListener("touchstart", this.beginDraw);
     canvas.addEventListener("touchmove", this.moving);
     canvas.addEventListener("touchend", this.endDraw);
-    canvas.style.background = "red"
+
+    if (this.background) {
+      canvas.style.background = this.background;
+    }
+
     this.canvas = canvas;
     this.ctx = ctx;
-
   },
   methods: {
     changeLineWidth(val) {
@@ -248,6 +245,10 @@ export default {
     draw(isUp = false) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+      if (this.background) {
+        this.ctx.fillStyle = this.background;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      }
 
       //绘制不包含this.line的线条
       this.pointLines.forEach((line, index) => {
@@ -441,7 +442,7 @@ export default {
       if (this.pointLines.length == 0) {
         return;
       }
-      let data = this.canvas.toDataURL("image/png");
+      let data = this.canvas.toDataURL(this.type != "png" ? "image/jpeg" : "image/png");
       if (this.oncomplete) {
         // console.log("调用完成回调函数")
         this.oncomplete(data);
@@ -482,7 +483,6 @@ export default {
   opacity: 0.5;
 }
 .handwriting-canvas {
-  background-color: #ffc6c6;
   flex-grow: 1;
 }
 .handwriting-setting {
