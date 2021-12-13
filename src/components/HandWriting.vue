@@ -2,6 +2,9 @@
   <div class="handwriting">
     <div class="handwriting-header">
 
+      <div @click="small()">缩小</div>
+      <div @click="big()">放大</div>
+
       <img :class="['handwriting-img-back', pointLines.length == 0 ? 'handwriting-img-disable' : '']" alt="返回上一步" src="~@/assets/image/handwriting-back.png" @click="backPreStep()">
       <img class="handwriting-img-setting" alt="设置颜色和笔刷" src="~@/assets/image/handwriting-setting.png" @click="showSetting = !showSetting">
       <div :class="[pointLines.length == 0 ? 'handwriting-img-disable' : '']" @click="save()">完成</div>
@@ -63,6 +66,8 @@ export default {
   data() {
     return {
       COLORS: ["#222222", "#F3100F", "#F7A311", "#21CD38", "#359FF4", "#5D5FE9"],
+      scale: 1,
+      scaleRate: 1,
       lineWidth: 8,
       lineColor: "#222222",
       canvas: null,
@@ -89,11 +94,12 @@ export default {
     let width = canvas.clientWidth;
     let height = canvas.clientHeight;
     if (window.devicePixelRatio) {
+      this.scale = window.devicePixelRatio;
       canvas.style.width = width + "px";
       canvas.style.height = height + "px";
       canvas.height = height * window.devicePixelRatio;
       canvas.width = width * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      ctx.scale(this.scale, this.scale);
     }
 
     canvas.onmousedown = this.beginDraw;
@@ -112,6 +118,29 @@ export default {
     this.ctx = ctx;
   },
   methods: {
+    small() {
+      if (this.scaleRate <= 1) {
+        return;
+      }
+      this.scaleRate = this.scaleRate - 0.5;
+      this.ctx.scale(1 / this.scale, 1 / this.scale);
+      this.scale = window.devicePixelRatio * this.scaleRate;
+      this.ctx.scale(this.scale, this.scale);
+
+
+
+    },
+    big() {
+      if (this.scaleRate >= 8) {
+        return;
+      }
+      this.scaleRate = this.scaleRate + 0.5;
+      this.ctx.scale(1 / this.scale, 1 / this.scale);
+      this.scale = window.devicePixelRatio * this.scaleRate;
+      this.ctx.scale(this.scale, this.scale);
+
+
+    },
     changeLineWidth(val) {
       this.lineWidth = val;
     },
@@ -139,6 +168,7 @@ export default {
       this.line.lineColor = this.lineColor;
       this.addPoint(this.GetPos(event));
       this.preTime = Date.now();
+      console.log(this.GetPos(event))
     },
     endDraw(event) {
       if (!this.isDown) {
